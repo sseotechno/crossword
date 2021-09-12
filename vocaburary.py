@@ -45,27 +45,5 @@ class vocaburary (object):
         self.word_collecton_used.add(word)
         return     
 
-#############
-# DRIVER
-#############
-
-vocaburary.print_version()
-myVoca = vocaburary()
-
-word_list =  ["Melbourne", "Sydney", "School", "Brisbane", "Perth", "Norway", "Korea", "Amsterdam", "abcdefgabcdefg"]
-
-for word in word_list: 
-    myVoca.word_collecton.add(word)
-
-print (myVoca.word_collecton)
-
-matched_chars = vocaburary.get_cross("abcdefgabcdefg", "giant")
-print (matched_chars)
-
-last_word = myVoca.get_word_randomly()
-myVoca.move_word_to_restroom(last_word)
-print (myVoca.word_collecton)
-print (myVoca.word_collecton_used)
-
 
 
