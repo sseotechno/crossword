@@ -54,19 +54,28 @@ if __name__ == "__main__":
     test_voca(myVoca)
 
     pick_word = myVoca.get_word_randomly()
-    cb.place_horse_initial(pick_word, direction = crossword_board.HORIZONTAL)
+    cb.place_horse_initial(pick_word)
     myVoca.move_word_to_restroom(pick_word)
     
+    cb.display()
+    cb.set_next_direction()
     pick_word = myVoca.get_word_randomly()
-    cb.place_new_crossed_horse(pick_word, cb.get_next_direction())
-    pick_word = myVoca.get_word_randomly()
-    cb.place_new_crossed_horse(pick_word, cb.get_next_direction())
-    
-    pick_word = myVoca.get_word_randomly()
-    cb.place_new_crossed_horse(pick_word, cb.get_next_direction())
-    pick_word = myVoca.get_word_randomly()
-    cb.place_new_crossed_horse(pick_word, cb.get_next_direction())
+    cb.place_new_crossed_horse(pick_word)
+    myVoca.move_word_to_restroom(pick_word)
 
+    cb.display()
+    
+    cb.set_next_direction()            
+    pick_word = myVoca.get_word_randomly()
+    cb.place_new_crossed_horse(pick_word)
+    myVoca.move_word_to_restroom(pick_word)
+
+    cb.display()
+    cb.set_next_direction()
+    pick_word = myVoca.get_word_randomly()
+    cb.place_new_crossed_horse(pick_word)
+    myVoca.move_word_to_restroom(pick_word)
+    
     cb.display()
     cb.list_horses()
 

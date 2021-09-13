@@ -52,6 +52,7 @@ class crossword_board(object):
             self.next_direction = crossword_board.VERTICAL
         else:
             self.next_direction = crossword_board.HORIZONTAL
+        return self.next_direction
 
     @staticmethod
     def get_cross(lst1, lst2):
@@ -71,8 +72,9 @@ class crossword_board(object):
 
     def display (self):
         print(self.board_array)
-        print(self.mask_horizontal)
-        print(self.mask_vertical)
+        print("__________________")
+        # print(self.mask_horizontal)
+        # print(self.mask_vertical)
 
     #######################
     # Masking 
@@ -131,55 +133,65 @@ class crossword_board(object):
                 np.put(self.board_array,axis,char)
                 i += 1
 
-    def place_horse_initial(self, word, direction):
+    def place_horse_initial(self, word):
         pos = list()
-        if direction == crossword_board.HORIZONTAL:
+        if self.next_direction == crossword_board.HORIZONTAL:
             x = int((self.X_max-len(word)) / 2)
             y = int(self.Y_max / 2)
             pos = (y,x)
-            
         else:
             x = int(self.X_max / 2) 
             y = int((self.Y_max-len(word)) / 2)
             print(f"x={x}, y={y}")
             pos = (y,x)
 
-        pos = self.place_new_horse(word, pos,direction)
-        self.place_new_horse(word, pos, direction)        
+        pos = self.place_new_horse(word, pos)
+        
         return pos
 
-    def place_new_horse (self, pick_word, pos, direction):
-        self.create_new_horse(pick_word, pos, direction)
-        self.draw_new_horse (pick_word, pos, direction)
-        self.mask_board(pick_word, pos, direction)
-        self.set_next_direction()
-        return pos
 
-    def place_new_crossed_horse(self, pick_word, direction):
-        adjusted_axies = self.position_new_horse(pick_word)
-        self.place_new_horse (pick_word, adjusted_axies, direction)
 
     def position_new_horse(self, pick_word):
-        random_horse_on_board = random.choice(tuple(self.horses_on_board))
+        
+        # filtered_horses = filter(lambda horse: horse.direction ==  self.next_direction, self.horses_on_board)
 
-        print (f'random_horse_on_board:{random_horse_on_board.word}')
-        print (f'pick_word:{pick_word}')
-    
-        crossed_char_list = crossword_board.get_cross(random_horse_on_board.word, pick_word)
+        filtered_horses = list()
+        item:board_horse
+        for item in self.horses_on_board:
+            if item.direction !=  self.next_direction:
+                filtered_horses.append(item) 
+        print(f"filtered: {list(filtered_horses)}")
+        
+        if len(filtered_horses) > 0:
+            random_horse_on_board = random.choice(tuple(filtered_horses)) 
+        else:
+            random_horse_on_board = random.choice(tuple(self.horses_on_board)) 
+
+        crossed_char_list = crossword_board.get_cross(random_horse_on_board.available_chars, pick_word)
         print (crossed_char_list)
+
+        adjusted_axies = (0,0)
+
         if len(crossed_char_list) > 0: 
             cross_char = crossed_char_list[0]
             adjusted_axies = self.find_crossed_char_horse_axies(random_horse_on_board,cross_char)
-            delta_index = self.find_crossed_char_voca_index(pick_word, cross_char)
+            delta_index_pick = self.find_crossed_char_voca_index(pick_word, cross_char)
 
-            print (f"adj   {adjusted_axies}")
-            print (f"delta {delta_index}")
+            print (f"-------------------------------------------")
+            print (f"horse:             {random_horse_on_board}")
+            print (f"horse_pos:         {random_horse_on_board.axis}")
+            print (f"pick_word:         {pick_word}")
+            print (f"crossed_spot:      {adjusted_axies}")
+            print (f"delta              {delta_index_pick}")
 
             if self.next_direction == crossword_board.HORIZONTAL:
-                adjusted_axies[1] = adjusted_axies[1] + delta_index - 1
+                adjusted_axies[1] = adjusted_axies[1] - delta_index_pick - 1
+               
             else:
-                adjusted_axies[0] = adjusted_axies[0] - delta_index 
-            print (f"readj  {adjusted_axies}")
+                adjusted_axies[0] = adjusted_axies[0] - delta_index_pick 
+
+            print (f"adjusted           {adjusted_axies}")
+            print (f"direction          {self.next_direction}")
             
         return adjusted_axies
 
@@ -198,10 +210,21 @@ class crossword_board(object):
         for i in self.horses_on_board:
             print (i) 
 
-
     def find_crossed_char_horse_axies(self,horse:board_horse,char):
         return horse.get_char_axies(char)
 
     def find_crossed_char_voca_index(self, voca, cross_char):
         index = list(voca).index(cross_char)
         return index 
+
+    def place_new_horse (self, pick_word, pos):
+        direction = self.get_next_direction()
+        self.create_new_horse(pick_word, pos, direction)
+        self.draw_new_horse (pick_word, pos, direction)
+        self.mask_board(pick_word, pos, direction)     
+
+        return pos
+
+    def place_new_crossed_horse(self, pick_word):
+        adjusted_axies = self.position_new_horse(pick_word)
+        self.place_new_horse (pick_word, adjusted_axies)
