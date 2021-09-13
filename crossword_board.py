@@ -160,10 +160,7 @@ class crossword_board(object):
         self.place_new_horse (pick_word, adjusted_axies, direction)
 
     def position_new_horse(self, pick_word):
-
-        
         random_horse_on_board = random.choice(tuple(self.horses_on_board))
-
 
         print (f'random_horse_on_board:{random_horse_on_board.word}')
         print (f'pick_word:{pick_word}')
