@@ -1,5 +1,6 @@
 from typing import ClassVar
 import random
+import csv
 
 class vocaburary (object):
 
@@ -13,7 +14,7 @@ class vocaburary (object):
 
     def __repr__(self):
         return f'<vocaburary> {format(self.version)}'
-
+        
     @property 
     def get_version(self):
         return self._version
@@ -37,13 +38,22 @@ class vocaburary (object):
         self.word_collecton.add(word)
         return
 
+    def select_final_list_randomly(self, num_to_select):
+        self.word_collecton = random.sample(self.word_collecton, num_to_select)
+        return 
+
     def get_word_randomly(self):
         return random.choice(tuple(self.word_collecton))
     
-    def move_word_to_restroom(self, word):
-        self.word_collecton.remove(word)
-        self.word_collecton_used.add(word)
+    def move_word_to_restroom(self, last_word):
+        self.word_collecton.remove(last_word)
         return     
 
+    def readCSV(self,filepath):
+        with open(filepath, newline='\n') as csvfile:
+            datareader = csv.reader(csvfile, delimiter=',')
+            for row in datareader:
+                # print(row)
+                self.add_word(row[0])
 
 

@@ -1,42 +1,80 @@
 from vocaburary import vocaburary 
 from crossword_board import crossword_board 
+from gameplay import gameplay 
+import numpy
+import random
+# import os
+
+from os import system
+
+
+
 
 #############
 # DRIVER
 #############
 
-
 def test_board(board):
-    board.resize_board(16,16)
+    board.print_version()
+    board.resize_board(20,20)
     board.put(0,0, "A")
     board.put(1,0, "B")
     board.put(0,1, "a")
     board.put(1,1, "b")
     board.put(15,15, "Z")
     board.display_board()
-    board.print_version()
     return 
 
 def test_voca(voca):
-    
     word_list =  ["Melbourne", "Sydney", "School", "Brisbane", "Perth", "Norway", "Korea", "Amsterdam", "abcdefgabcdefg"]
-    for word in word_list: 
-        voca.word_collecton.add(word)
+    for item in word_list: 
+        pass
+        # voca        .word_collecton.add(item)
 
-    print (voca.word_collecton)
     matched_chars = vocaburary.get_cross("abcdefgabcdefg", "giant")
     print (matched_chars)
-
-    last_word = voca.get_word_randomly()
-    voca.move_word_to_restroom(last_word)
-    print (voca.word_collecton)
-    print (voca.word_collecton_used)
-
     return 
 
+if __name__ == "__main__":
 
-wb = crossword_board()
-myVoca = vocaburary()
+    ## AJUST WIDTH OF TERMINAL 
+    # system('mode con cols=120')
+    numpy.set_printoptions(linewidth=160)
 
-test_board(wb)
-test_voca(myVoca)
+    cb = crossword_board()
+    cb.resize_board(20,20)
+    myVoca = vocaburary()
+    myVoca.readCSV('countries.csv')
+    myVoca.select_final_list_randomly(10)
+    game = gameplay(cb,myVoca)
+
+    
+
+    #test_board(cb)
+    test_voca(myVoca)
+
+    pick_word = myVoca.get_word_randomly()
+    cb.place_horse_initial(pick_word, direction = crossword_board.HORIZONTAL)
+    myVoca.move_word_to_restroom(pick_word)
+    
+    pick_word = myVoca.get_word_randomly()
+    cb.place_new_crossed_horse(pick_word, cb.get_next_direction())
+    pick_word = myVoca.get_word_randomly()
+    cb.place_new_crossed_horse(pick_word, cb.get_next_direction())
+    
+    pick_word = myVoca.get_word_randomly()
+    cb.place_new_crossed_horse(pick_word, cb.get_next_direction())
+    pick_word = myVoca.get_word_randomly()
+    cb.place_new_crossed_horse(pick_word, cb.get_next_direction())
+
+    cb.display()
+    cb.list_horses()
+
+
+
+
+    
+
+
+
+
