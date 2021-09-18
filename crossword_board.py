@@ -6,12 +6,12 @@ import random
 
 class crossword_board(object):
 
-    version = " Crossword Board 1.0 "
+    VERSION = " Crossword Board 1.0 "
     HORIZONTAL = "HORIZONTAL"
     VERTICAL = "VERTICAL"
 
     def __init__(self):
-        self._version = crossword_board.version
+        self._version = crossword_board.VERSION
         self.next_direction = crossword_board.HORIZONTAL
         self.X_max=20
         self.Y_max=20
@@ -30,12 +30,7 @@ class crossword_board(object):
 
     @staticmethod
     def print_version():
-        print (crossword_board.version.center(80, '='))
-        return
-
-    @staticmethod
-    def printGuideline():
-        print ("\t\t123456789012345678901234567890")
+        print (crossword_board.VERSION.center(80, '='))
         return
 
     # def put (self, x,y, val):
@@ -56,18 +51,12 @@ class crossword_board(object):
             self.next_direction = crossword_board.HORIZONTAL
         return self.next_direction
 
-    @staticmethod
-    def find_crossed_chars(lst1, lst2):
-        lst3 = [value for value in lst1 if value in lst2]
-        return lst3
-
     #######################
     # Board 
     #######################
 
     def resize_board(self,x,y):
         self.board_array = np.resize (self.board_array,(x,y))
-        #self.board_array.zeros( (x, y) , str)
         self.board_array.fill(" ")
         self.X_max=x
         self.Y_max=y
@@ -75,16 +64,10 @@ class crossword_board(object):
     def display (self):
         print(self.board_array)
         print("__________________")
-        # print(self.mask_horizontal)
-        # print(self.mask_vertical)
-
-
-
+ 
     #######################
     # Placing a horse  
     #######################
-
- 
 
     def place_horse_initial(self, word):
         pos = list()
@@ -120,11 +103,11 @@ class crossword_board(object):
             random_horse_on_board = random.choice(tuple(self.horses_on_board)) 
 
 
-        crossed_char_list = crossword_board.find_crossed_chars(random_horse_on_board.available_chars, new_word)
+        crossed_char_list = cross_checker.find_matched_chars(random_horse_on_board.available_chars, new_word)
         if len(crossed_char_list) > 0: 
             cross_char = random.choice(tuple(crossed_char_list))
             new_xy = self.find_crossed_char_horse_xy(random_horse_on_board,cross_char)
-            delta = self.find_crossed_char_voca_index(new_word, cross_char)
+            delta = cross_checker.find_index_char_from_word(new_word, cross_char)
             if self.next_direction == crossword_board.HORIZONTAL:
                 new_xy[1] = new_xy[1] - delta - 1
             else:
@@ -159,10 +142,6 @@ class crossword_board(object):
     def find_crossed_char_horse_xy(self,horse:board_horse,char):
         return horse.get_1st_char_xy(char)
 
-    def find_crossed_char_voca_index(self, voca, cross_char):
-        index = list(voca).index(cross_char)
-        return index 
-    
 
     #####################
     # Handling Horse

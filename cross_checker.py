@@ -78,6 +78,16 @@ class cross_checker(object):
         print ("\t\t123456789012345678901234567890")
         return
 
+    @staticmethod
+    def find_matched_chars(lst1, lst2):
+        lst3 = [value for value in lst1 if value in lst2]
+        return lst3
+
+    @staticmethod
+    def find_index_char_from_word(voca, cross_char):
+        index = list(voca).index(cross_char)
+        return index 
+
     def mask_new_horse (self, new_word, pos, direstion):
         self.mask_board(new_word, pos, direstion)  
 
@@ -147,13 +157,3 @@ class cross_checker(object):
         print (f'check_bound - ({x}, {y})')
 
         return result
-
-    @staticmethod
-    def find_matched_chars(self,lst1, lst2):
-        lst3 = [value for value in lst1 if value in lst2]
-        return lst3
-
-    @staticmethod
-    def find_index_char_from_word(self, voca, cross_char):
-        index = list(voca).index(cross_char)
-        return index 
