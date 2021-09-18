@@ -72,15 +72,15 @@ class crossword_board(object):
     def place_horse_initial(self, word):
         pos = list()
         if self.next_direction == crossword_board.HORIZONTAL:
-            x = int((self.X_max-len(word)) / 2)
+            x = int((self.X_max+len(word)) / 2 - len(word))
             y = int(self.Y_max / 2)
             pos = (y,x)
         else:
             x = int(self.X_max / 2) 
-            y = int((self.Y_max-len(word)) / 2)
-            print(f"x={x}, y={y}")
+            y = int((self.Y_max+len(word)) / 2 - len(word))
             pos = (y,x)
 
+        print(f"x={x}, y={y}")        
         pos = self.place_new_horse(word, pos)
         
         return pos
@@ -90,23 +90,22 @@ class crossword_board(object):
         new_xy=(0,0)
 
         # filtered_horses = filter(lambda horse: horse.direction ==  self.next_direction, self.horses_on_board)
-        horses_located_in_cross = list()
+        horses_located_in_cross_lines = list()
         item:board_horse
         for item in self.horses_on_board:
             if item.direction !=  self.next_direction:
-                horses_located_in_cross.append(item) 
-        print(f"filtered: {list(horses_located_in_cross)}")
+                horses_located_in_cross_lines.append(item) 
+
+        print(f"Filtered: {list(horses_located_in_cross_lines)}")
         
-        if len(horses_located_in_cross) > 0:
-            random_horse_on_board = random.choice(tuple(horses_located_in_cross)) 
-        else:
-            random_horse_on_board = random.choice(tuple(self.horses_on_board)) 
+        crossed_char_list=list()
+        if len(horses_located_in_cross_lines) > 0:
+            a_random_horse_in_cross_lines = random.choice(tuple(horses_located_in_cross_lines)) 
+            crossed_char_list = cross_checker.find_matched_chars(a_random_horse_in_cross_lines.available_chars, new_word)
 
-
-        crossed_char_list = cross_checker.find_matched_chars(random_horse_on_board.available_chars, new_word)
         if len(crossed_char_list) > 0: 
             cross_char = random.choice(tuple(crossed_char_list))
-            new_xy = self.find_crossed_char_horse_xy(random_horse_on_board,cross_char)
+            new_xy = self.find_crossed_char_horse_xy(a_random_horse_in_cross_lines,cross_char)
             delta = cross_checker.find_index_char_from_word(new_word, cross_char)
             if self.next_direction == crossword_board.HORIZONTAL:
                 new_xy[1] = new_xy[1] - delta - 1
@@ -115,13 +114,16 @@ class crossword_board(object):
 
             print (f"-------------------------------------------")
             print (f"crosssed char(s):  {crossed_char_list}")
-            print (f"horse:             {random_horse_on_board}")
-            print (f"horse_pos:         {random_horse_on_board.xy}")
+            print (f"horse:             {a_random_horse_in_cross_lines}")
+            print (f"horse_pos:         {a_random_horse_in_cross_lines.xy}")
             print (f"new_word:          {new_word}")
             print (f"crossed_spot:      {new_xy}")
             print (f"delta              {delta}")
             print (f"direction          {self.next_direction}")
-            
+                
+            if (new_xy[0] < 0 or new_xy[1] < 0): 
+                return (0,0)
+
         return new_xy
     
     def draw_new_horse (self, word, pos, direction):
@@ -164,7 +166,7 @@ class crossword_board(object):
 
         if self.cross_checker.check_boundary(new_word, pos, direction):
             self.cross_checker.mark_new_cells(new_word, pos, direction)
-            if self.cross_checker.comparison_same_direction(direction):
+            if self.cross_checker.comparison_in_same_direction(direction):
                 self.create_new_horse(new_word, pos, direction)
                 self.draw_new_horse (new_word, pos, direction)
                 self.cross_checker.mark_used_cells(new_word, pos, direction)
@@ -174,4 +176,5 @@ class crossword_board(object):
 
     def place_new_crossed_horse(self, new_word):
         new_xy = self.positioning_horse(new_word)
+        print (f"New horse positon = {new_xy}")
         self.place_new_horse (new_word, new_xy)

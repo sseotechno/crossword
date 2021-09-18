@@ -37,13 +37,16 @@ class cross_checker(object):
                 np.put(self.board_new_horse,axis,1)
                 np.put(self.mask_horizontal,axis,1)
                 i += 1
+            self.mask_board(word, x, y, direction)
         else:
             for char in list(word):
                 axis = x + (y + i) * self.X_max
                 np.put(self.board_new_horse,axis,1)
                 np.put(self.mask_vertical,axis,1)
                 i += 1
+            self.mask_board(word, x, y, direction)
    
+
     def mark_new_cells (self, word, pos, direction):
         self.reset_new_cell_aray()
 
@@ -94,52 +97,76 @@ class cross_checker(object):
     #######################
     # Masking 
     #######################
-    def mask_board(self, word, pos, direction):
-        y=pos[0]
-        x=pos[1]
+    def mask_board(self, word, x,y , direction):
 
         if direction == cross_checker.HORIZONTAL:
             i = 0 
             for char in list(word):
-                self.mask_horizontal[y-1,x+i]=1
-                self.mask_horizontal[y,x+i]=1
-                self.mask_horizontal[y+1,x+i]=1
+                if (y-1 >= 0 and x+i < self.X_max): 
+                    self.mask_horizontal[y-1,x+i]=1
+                if (x+i < self.X_max): 
+                    self.mask_horizontal[y,x+i]=1
+                if (y+1 < self.Y_max and x+i < self.X_max): 
+                    self.mask_horizontal[y+1,x+i]=1
                 i += 1
 
-            self.mask_horizontal[y,x-1]=1
-            self.mask_horizontal[y,x+len(word)]=1
+            if (x-1 >= 0): 
+                self.mask_horizontal[y,x-1]=1
 
-            self.mask_horizontal[y-1,x-1]=0
-            self.mask_horizontal[y+1,x-1]=0
-            self.mask_horizontal[y-1,x+len(word)]=0
-            self.mask_horizontal[y+1,x+len(word)]=0
+            if (x+len(word) < self.X_max): 
+                self.mask_horizontal[y,x+len(word)]=1
+
+            if y-1 >= 0:
+                if x-1 >= 0: 
+                    self.mask_horizontal[y-1,x-1]=0
+                if x+len(word) < self.X_max: 
+                    self.mask_horizontal[y-1,x+len(word)]=0
+
+            if y+1 < self.Y_max: 
+                if x-1 >= 0: 
+                    self.mask_horizontal[y+1,x-1]=0
+                if x+len(word) < self.X_max: 
+                    self.mask_horizontal[y+1,x+len(word)]=0
         else:             
             i = 0 
             for char in list(word):
-                self.mask_vertical[y+i,x-1]=1
-                self.mask_vertical[y+i,x]=1
-                self.mask_vertical[y+i,x+1]=1
+                if (y+1 < self.Y_max and x-1 >= 0): 
+                    self.mask_vertical[y+i,x-1]=1
+                if (y+1 < self.Y_max): 
+                    self.mask_vertical[y+i,x]=1
+                if (y+1 < self.Y_max and x+1 < self.X_max): 
+                    self.mask_vertical[y+i,x+1]=1
                 i += 1
 
-            self.mask_vertical[y-1,x]=1
-            self.mask_vertical[y+len(word),x]=1
+            if (y-1 >= 0): 
+                self.mask_vertical[y-1,x]=1
+            
+            if (y+len(word) < self.Y_max): 
+                self.mask_vertical[y+len(word),x]=1
 
-            self.mask_vertical[y-1,x-1]=0
-            self.mask_vertical[y-1,x+1]=0
-            self.mask_vertical[y+len(word),x-1]=0
-            self.mask_vertical[y+len(word),x+1]=0
+            if y-1 >= 0:
+                if x-1 >= 0: 
+                    self.mask_vertical[y-1,x-1]=0
+                if x+1 < self.X_max: 
+                    self.mask_vertical[y-1,x+1]=0
+
+            if y+len(word) < self.Y_max:
+                if x-1 > 0: 
+                    self.mask_vertical[y+len(word),x-1]=0
+                if x+1 < self.X_max: 
+                    self.mask_vertical[y+len(word),x+1]=0
 
 
-    def comparison_same_direction(self, direction):
+    def comparison_in_same_direction(self, direction):
         if direction == cross_checker.HORIZONTAL:
             board = np.logical_and(self.mask_horizontal,self.board_new_horse)
         else:
             board = np.logical_and(self.mask_vertical,self.board_new_horse)
 
-        if np.count_nonzero(board == True) > 0 :
-            return False
-        else:
+        if np.count_nonzero(board == True) == 0 : # IF NO EXISTING CELL IS OVERWRITTEN
             return True
+        else:
+            return False
 
     def check_boundary(self, word, pos, direction):
         y=pos[0]
