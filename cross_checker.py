@@ -33,35 +33,27 @@ class cross_checker(object):
         i = 0 
         if direction == cross_checker.HORIZONTAL:
             for char in list(word):
-                axis = (x + i) + y * self.X_max 
-                np.put(self.board_new_horse,axis,1)
-                np.put(self.mask_horizontal,axis,1)
+                self.mask_horizontal[y,x + i]=1
                 i += 1
             self.mask_board(word, x, y, direction)
         else:
             for char in list(word):
-                axis = x + (y + i) * self.X_max
-                np.put(self.board_new_horse,axis,1)
-                np.put(self.mask_vertical,axis,1)
+                self.mask_vertical[y+i,x]=1
                 i += 1
             self.mask_board(word, x, y, direction)
    
-
     def mark_new_cells (self, word, pos, direction):
         self.reset_new_cell_aray()
-
         y=pos[0]
         x=pos[1]
         i = 0 
         if direction == cross_checker.HORIZONTAL:
             for char in list(word):
-                axis = (x + i) + y * self.X_max 
-                np.put(self.board_new_horse,axis,1)
+                self.board_new_horse[y,x+i]=1
                 i += 1
         else:
             for char in list(word):
-                axis = x + (y + i) * self.X_max
-                np.put(self.board_new_horse,axis,1)
+                self.board_new_horse[y+i,x]=1
                 i += 1
 
     def reset_new_cell_aray(self):
@@ -157,16 +149,22 @@ class cross_checker(object):
                     self.mask_vertical[y+len(word),x+1]=0
 
 
-    def comparison_in_same_direction(self, direction):
-        if direction == cross_checker.HORIZONTAL:
-            board = np.logical_and(self.mask_horizontal,self.board_new_horse)
+    def __compare_arrays_overlay(self, array1, array2):        
+        result = False 
+        tempArray = np.logical_and(array1,array2)
+        if np.count_nonzero(tempArray == True) == 0 : # IF NO EXISTING CELL IS OVERWRITTEN
+            result = True
         else:
-            board = np.logical_and(self.mask_vertical,self.board_new_horse)
+            result = False
+        return result 
 
-        if np.count_nonzero(board == True) == 0 : # IF NO EXISTING CELL IS OVERWRITTEN
-            return True
+    def comparison_in_same_direction(self, direction):
+        
+        if direction == cross_checker.HORIZONTAL:
+            result = self.__compare_arrays_overlay(self.mask_horizontal,self.board_new_horse)
         else:
-            return False
+            result = self.__compare_arrays_overlay(self.mask_vertical,self.board_new_horse)
+        return result 
 
     def check_boundary(self, word, pos, direction):
         y=pos[0]
@@ -174,13 +172,67 @@ class cross_checker(object):
         result = True 
 
         if direction == cross_checker.HORIZONTAL:
-            if (x + len(word) > self.X_max): 
-
+            if (x + len(word) >= self.X_max): 
                 result = False 
         else: 
-            if (y + len(word) > self.Y_max): 
+            if (y + len(word) >= self.Y_max): 
                 result = False
 
-        print (f'check_bound - ({x}, {y})')
+            print (f'check_bound - ({x}, {y})')
 
         return result
+
+    def get_random_valid_pos(self, direction, new_word):
+        result = False
+        tempArray = np.zeros((self.X_max, self.Y_max), dtype = bool)
+        
+        if direction == cross_checker.HORIZONTAL:
+            random_num_X = np.random.randint(0,self.X_max-len(new_word))
+            random_num_Y = np.random.randint(0,self.Y_max)
+            # print (f"WORD:      {new_word}")
+            # print (f"RANDOM: X: {random_num_X}")
+            # print (f"RANDOM: Y: {random_num_Y}")
+            i = 0 
+            for char in list(new_word):
+                yx = (random_num_X + i) + random_num_Y * self.X_max 
+                np.put(tempArray,yx,char)
+                i += 1
+            result = self.__compare_arrays_overlay(tempArray, self.mask_horizontal)
+        else:
+            random_num_X = np.random.randint(0,self.X_max)
+
+            # print (f"new_word+1:                      {new_word}")
+            # print (f"self.Y_max-len(new_word)+1:      {self.Y_max-len(new_word)}")
+
+            random_num_Y = np.random.randint(0,self.Y_max-len(new_word)+1)
+            
+            # print (f"WORD:      {new_word}")
+            # print (f"RANDOM: X: {random_num_X}")
+            # print (f"RANDOM: Y: {random_num_Y}")
+            i = 0 
+            for char in list(new_word):
+                tempArray[random_num_Y + i, random_num_X] = char 
+                i += 1
+            result = self.__compare_arrays_overlay(tempArray, self.mask_vertical)
+
+        return (result, (random_num_Y, random_num_X))
+
+
+    def check_individual_char_in_cells(board_array, word, start_pos, direction):
+            result = True
+            y=start_pos[0]
+            x=start_pos[1]
+            i = 0 
+            if direction == cross_checker.HORIZONTAL:
+                for char in list(word):
+                    cell_value = board_array[y,x+i]
+                    if (char != cell_value and cell_value  !=" "):
+                        result = False 
+                    i += 1
+            else:
+                for char in list(word):
+                    cell_value = board_array[y+i,x]
+                    if (char != cell_value and cell_value  !=" "):
+                        result = False 
+                    i += 1
+            return result

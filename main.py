@@ -13,7 +13,7 @@ from os import system
 
 def test_board(board):
     board.print_version()
-    board.resize_board(20,20)
+    board.resize_board(30,30)
     board.put(0,0, "A")
     board.put(1,0, "B")
     board.put(0,1, "a")
@@ -43,11 +43,25 @@ if __name__ == "__main__":
     # system('mode con cols=120')
     numpy.set_printoptions(linewidth=160)
 
-    cb = crossword_board()
-    cb.resize_board(20,20)
+
+
+    #####################
+    # PARAMETERS 
+    #####################
+    VOCA_COUNT = 50
+    word_count = 40
+    BOARD_SIZE = 30
+    FILE_NAME = 'countries.csv'
+
+    #####################
+    # RUN  
+    #####################
+
+    cb = crossword_board(BOARD_SIZE,BOARD_SIZE)
+    cb.resize_board(BOARD_SIZE,BOARD_SIZE)
     myVoca = vocaburary()
-    myVoca.readCSV('countries.csv')
-    myVoca.select_final_list_randomly(10)
+    myVoca.readCSV(FILE_NAME)
+    myVoca.select_final_list_randomly(VOCA_COUNT)
     game = gameplay(cb,myVoca)
 
     #test_board(cb)
@@ -56,28 +70,20 @@ if __name__ == "__main__":
     new_word = myVoca.get_word_randomly()
     cb.place_horse_initial(new_word)
     myVoca.move_word_to_restroom(new_word)
-    
-    cb.display()
     cb.set_next_direction()
-    new_word = myVoca.get_word_randomly()
-    cb.place_new_crossed_horse(new_word)
-    myVoca.move_word_to_restroom(new_word)
+    cb.display()
 
-    cb.display()
-    
-    cb.set_next_direction()            
-    new_word = myVoca.get_word_randomly()
-    cb.place_new_crossed_horse(new_word)
-    myVoca.move_word_to_restroom(new_word)
 
-    cb.display()
-    cb.set_next_direction()
-    new_word = myVoca.get_word_randomly()
-    cb.place_new_crossed_horse(new_word)
-    myVoca.move_word_to_restroom(new_word)
-    
-    cb.display()
+    while word_count > 0:     
+        new_word = myVoca.get_word_randomly()
+        cb.place_new_crossed_horse(new_word)
+        myVoca.move_word_to_restroom(new_word)
+        cb.display()
+        cb.set_next_direction()            
+        word_count -= 1
+
     cb.list_horses()
+    cb.get_random_location(new_word)
 
 
 

@@ -4,16 +4,16 @@ import csv
 
 class vocaburary (object):
 
-    version = " vocaburary 1.0 "
+    VERSION = " vocaburary 1.0 "
 
     def __init__(self):
-        self._version = vocaburary.version
+        self._version = vocaburary.VERSION
         self.word_collecton = set()
         self.word_collecton_used = set()
         #self.characters = list(self.word) # Split string to characters
 
     def __repr__(self):
-        return f'<vocaburary> {format(self.version)}'
+        return f'<vocaburary> {format(self.VERSION)}'
         
     @property 
     def get_version(self):
@@ -21,12 +21,7 @@ class vocaburary (object):
 
     @staticmethod
     def print_version():
-        print (vocaburary.version.center(80, '='))
-        return
-
-    @staticmethod
-    def printGuideline():
-        print ("\t\t123456789012345678901234567890")
+        print (vocaburary.VERSION.center(80, '='))
         return
 
     @staticmethod
@@ -53,7 +48,6 @@ class vocaburary (object):
         with open(filepath, newline='\n') as csvfile:
             datareader = csv.reader(csvfile, delimiter=',')
             for row in datareader:
-                # print(row)
                 self.add_word(row[0])
 
 
