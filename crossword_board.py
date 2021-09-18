@@ -169,6 +169,8 @@ class crossword_board(object):
 
     def __validate_new_position (self, new_word, pos, direction):
 
+        if not self.cross_checker.check_word_length(new_word, self.X_max,self.Y_max):
+            return False 
 
         if not self.cross_checker.check_boundary(new_word, pos, direction):
             return False

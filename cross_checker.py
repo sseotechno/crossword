@@ -159,7 +159,7 @@ class cross_checker(object):
         return result 
 
     def comparison_in_same_direction(self, direction):
-        
+
         if direction == cross_checker.HORIZONTAL:
             result = self.__compare_arrays_overlay(self.mask_horizontal,self.board_new_horse)
         else:
@@ -183,15 +183,17 @@ class cross_checker(object):
         return result
 
     def get_random_valid_pos(self, direction, new_word):
+
+        print (f"**************************")
         result = False
         tempArray = np.zeros((self.X_max, self.Y_max), dtype = bool)
         
         if direction == cross_checker.HORIZONTAL:
             random_num_X = np.random.randint(0,self.X_max-len(new_word))
             random_num_Y = np.random.randint(0,self.Y_max)
-            # print (f"WORD:      {new_word}")
-            # print (f"RANDOM: X: {random_num_X}")
-            # print (f"RANDOM: Y: {random_num_Y}")
+            print (f"WORD:      {new_word}")
+            print (f"RANDOM: X: {random_num_X}")
+            print (f"RANDOM: Y: {random_num_Y}")
             i = 0 
             for char in list(new_word):
                 yx = (random_num_X + i) + random_num_Y * self.X_max 
@@ -200,15 +202,15 @@ class cross_checker(object):
             result = self.__compare_arrays_overlay(tempArray, self.mask_horizontal)
         else:
             random_num_X = np.random.randint(0,self.X_max)
+            random_num_Y = np.random.randint(0,self.Y_max-len(new_word))
 
-            # print (f"new_word+1:                      {new_word}")
-            # print (f"self.Y_max-len(new_word)+1:      {self.Y_max-len(new_word)}")
+            print (f"new_word+1:                      {new_word}")
+            print (f"self.Y_max-len(new_word)+1:      {self.Y_max-len(new_word)}")
 
-            random_num_Y = np.random.randint(0,self.Y_max-len(new_word)+1)
             
-            # print (f"WORD:      {new_word}")
-            # print (f"RANDOM: X: {random_num_X}")
-            # print (f"RANDOM: Y: {random_num_Y}")
+            # # print (f"WORD:      {new_word}")
+            # # print (f"RANDOM: X: {random_num_X}")
+            # # print (f"RANDOM: Y: {random_num_Y}")
             i = 0 
             for char in list(new_word):
                 tempArray[random_num_Y + i, random_num_X] = char 
@@ -216,6 +218,13 @@ class cross_checker(object):
             result = self.__compare_arrays_overlay(tempArray, self.mask_vertical)
 
         return (result, (random_num_Y, random_num_X))
+
+    def check_word_length(self, word, max_x, max_y):
+        result = False 
+        if (len(word) < max_x or len(word) < max_y):
+            result = True 
+        return result 
+
 
 
     def check_individual_char_in_cells(board_array, word, start_pos, direction):
