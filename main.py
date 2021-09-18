@@ -7,9 +7,6 @@ import random
 
 from os import system
 
-
-
-
 #############
 # DRIVER
 #############
@@ -37,6 +34,11 @@ def test_voca(voca):
 
 if __name__ == "__main__":
 
+
+    print (f"==============================================================")
+    print (f"===========================START==============================")
+    print (f"==============================================================")
+
     ## AJUST WIDTH OF TERMINAL 
     # system('mode con cols=120')
     numpy.set_printoptions(linewidth=160)
@@ -48,33 +50,31 @@ if __name__ == "__main__":
     myVoca.select_final_list_randomly(10)
     game = gameplay(cb,myVoca)
 
-    
-
     #test_board(cb)
     test_voca(myVoca)
 
-    pick_word = myVoca.get_word_randomly()
-    cb.place_horse_initial(pick_word)
-    myVoca.move_word_to_restroom(pick_word)
+    new_word = myVoca.get_word_randomly()
+    cb.place_horse_initial(new_word)
+    myVoca.move_word_to_restroom(new_word)
     
     cb.display()
     cb.set_next_direction()
-    pick_word = myVoca.get_word_randomly()
-    cb.place_new_crossed_horse(pick_word)
-    myVoca.move_word_to_restroom(pick_word)
+    new_word = myVoca.get_word_randomly()
+    cb.place_new_crossed_horse(new_word)
+    myVoca.move_word_to_restroom(new_word)
 
     cb.display()
     
     cb.set_next_direction()            
-    pick_word = myVoca.get_word_randomly()
-    cb.place_new_crossed_horse(pick_word)
-    myVoca.move_word_to_restroom(pick_word)
+    new_word = myVoca.get_word_randomly()
+    cb.place_new_crossed_horse(new_word)
+    myVoca.move_word_to_restroom(new_word)
 
     cb.display()
     cb.set_next_direction()
-    pick_word = myVoca.get_word_randomly()
-    cb.place_new_crossed_horse(pick_word)
-    myVoca.move_word_to_restroom(pick_word)
+    new_word = myVoca.get_word_randomly()
+    cb.place_new_crossed_horse(new_word)
+    myVoca.move_word_to_restroom(new_word)
     
     cb.display()
     cb.list_horses()
