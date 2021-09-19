@@ -1,6 +1,6 @@
 from typing import ClassVar
 import numpy as np
-from board_horse import board_horse
+from word_horse import word_horse
 import random
 
 class cross_checker(object):
@@ -232,6 +232,7 @@ class cross_checker(object):
             y=start_pos[0]
             x=start_pos[1]
             i = 0 
+            print(board_array)
             if direction == cross_checker.HORIZONTAL:
                 for char in list(word):
                     cell_value = board_array[y,x+i]

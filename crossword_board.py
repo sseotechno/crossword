@@ -1,6 +1,6 @@
 from typing import ClassVar
 import numpy as np
-from board_horse import board_horse
+from word_horse import word_horse
 from cross_checker import cross_checker
 import random
 
@@ -87,11 +87,10 @@ class crossword_board(object):
 
         # filtered_horses = filter(lambda horse: horse.direction ==  self.next_direction, self.horses_on_board)
         horses_located_in_cross_lines = list()
-        item:board_horse
+        item:word_horse
         for item in self.horses_on_board:
             if item.direction !=  self.next_direction:
                 horses_located_in_cross_lines.append(item) 
-
         #print(f"Filtered: {list(horses_located_in_cross_lines)}")
         
         crossed_char_list=list()
@@ -99,16 +98,21 @@ class crossword_board(object):
             a_random_horse_in_cross_lines = random.choice(tuple(horses_located_in_cross_lines)) 
             crossed_char_list = cross_checker.find_matched_chars(a_random_horse_in_cross_lines.available_chars, new_word)
 
+
+        print (f"-------------------------------------------")
+        
         if len(crossed_char_list) > 0: 
             cross_char = random.choice(tuple(crossed_char_list))
             new_yx = self.find_crossed_char_yx(a_random_horse_in_cross_lines,cross_char)
+            print (f"old_yx:            {new_yx}")
+            
             delta = cross_checker.find_index_char_from_word(new_word, cross_char)
             if self.next_direction == crossword_board.HORIZONTAL:
                 new_yx[1] = new_yx[1] - delta 
             else:
                 new_yx[0] = new_yx[0] - delta 
 
-            print (f"-------------------------------------------")
+            
             print (f"Crossed horse:     {a_random_horse_in_cross_lines}")
             print (f"horse_pos:         {a_random_horse_in_cross_lines.yx}")
             print (f"crosssed char(s):  {crossed_char_list}")
@@ -151,7 +155,7 @@ class crossword_board(object):
                 i += 1
         self.cross_checker.mark_used_cells(new_word, pos, direction)
 
-    def find_crossed_char_yx(self,horse:board_horse,char):
+    def find_crossed_char_yx(self,horse:word_horse,char):
         return horse.get_available_char_yx(char)
 
     #####################
@@ -205,7 +209,7 @@ class crossword_board(object):
         if self.__validate_new_position(new_word, pos, direction):                 
             self.cross_checker.mark_new_cells(new_word, pos, direction)
             # CREATE A NEW HORSE 
-            horse = board_horse(new_word, pos, direction)
+            horse = word_horse(new_word, pos, direction)
             self.horses_on_board.add(horse)
             self.draw_new_horse (new_word, pos, direction)
             
