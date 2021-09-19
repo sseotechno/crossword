@@ -48,9 +48,9 @@ if __name__ == "__main__":
     #####################
     # PARAMETERS 
     #####################
-    VOCA_COUNT = 50
-    word_count = 40
-    BOARD_SIZE = 30
+    VOCA_COUNT = 20
+    word_count = 10
+    BOARD_SIZE = 25
     FILE_NAME = 'countries.csv'
 
     #####################
