@@ -20,6 +20,10 @@ class crossword_board(object):
         self.mask_horizontal = np.zeros((self.X_max, self.Y_max))
         self.mask_vertical = np.zeros((self.X_max, self.Y_max))
         self.cross_checker = cross_checker(self.X_max, self.Y_max)
+
+        self.CROSS_CHECK_RETRY_COUNT = 30        # RETRY COUNTER - checking count of new corssed words 
+        self.RANDOM_POSITION_RETRY_COUNT = 20    # RETRY COUNTER - checking identifying avaialble cell randomly 
+
         
         # for i in range(self.X_max * self.Y_max):
         #     self.board_array.put(self.board_array,i,"M")
@@ -82,36 +86,35 @@ class crossword_board(object):
         return pos
 
 
-    def determin_horse_pos(self, new_word):
-        new_yx=(0,0)
+    def determine_horse_pos_crossed(self, new_word, random_pos=False):
+        new_yx=tuple((0,0))
 
         # filtered_horses = filter(lambda horse: horse.direction ==  self.next_direction, self.horses_on_board)
-        horses_located_in_cross_lines = list()
+        horses_in_same_direction = list()
         item:word_horse
         for item in self.horses_on_board:
             if item.direction !=  self.next_direction:
-                horses_located_in_cross_lines.append(item) 
-        #print(f"Filtered: {list(horses_located_in_cross_lines)}")
+                horses_in_same_direction.append(item) 
         
-        crossed_char_list=list()
-        if len(horses_located_in_cross_lines) > 0:
-            a_random_horse_in_cross_lines = random.choice(tuple(horses_located_in_cross_lines)) 
+        if len(horses_in_same_direction) > 0:
+            np.random.seed()
+            random.shuffle(horses_in_same_direction)
+            
+            a_random_horse_in_cross_lines = random.choice(tuple(horses_in_same_direction)) 
+            crossed_char_list = list()
             crossed_char_list = cross_checker.find_matched_chars(a_random_horse_in_cross_lines.available_chars, new_word)
+    
+            if (len(crossed_char_list) == 0 ):
+                return (0,0)
 
-
-        print (f"-------------------------------------------")
-        
-        if len(crossed_char_list) > 0: 
             cross_char = random.choice(tuple(crossed_char_list))
-            new_yx = self.find_crossed_char_yx(a_random_horse_in_cross_lines,cross_char)
-            print (f"old_yx:            {new_yx}")
+            crosssed_yx = self.find_crossed_char_yx(a_random_horse_in_cross_lines,cross_char)
             
             delta = cross_checker.find_index_char_from_word(new_word, cross_char)
             if self.next_direction == crossword_board.HORIZONTAL:
-                new_yx[1] = new_yx[1] - delta 
+                new_yx = tuple((crosssed_yx[0], crosssed_yx[1] - delta))
             else:
-                new_yx[0] = new_yx[0] - delta 
-
+                new_yx = tuple((crosssed_yx[0] - delta, crosssed_yx[1]))
             
             print (f"Crossed horse:     {a_random_horse_in_cross_lines}")
             print (f"horse_pos:         {a_random_horse_in_cross_lines.yx}")
@@ -121,22 +124,29 @@ class crossword_board(object):
             print (f"new_yx:            {new_yx}")
             print (f"delta              {delta}")
             
-                
-            if (new_yx[0] <= 0 or new_yx[1] <= 0): 
-                new_yx=(0,0)
-        
-        if (new_yx[0] <= 0 and new_yx[1] <= 0): 
-            found = False 
-            print (f">>>>>>>>>>>>>NEW RANDOM POSITION")
-            print (f">>>>>>>>>>>>>{new_word}")
-            while found == False: 
-                response = self.get_random_location(new_word)
-                found  = response[0] #Identify valid position for new word (not crossed)
-                new_yx = response[1]
-                
+
         print (f"final new_yx: {new_yx}")
         return new_yx
-    
+
+    def determine_horse_pos_randomly (self, new_word, direction, retry_count=10): 
+        print (f">>>>>>>>>>>>> NEW POSITION IS REQUIRED (RANDOM)")
+        print (f">>>>>>>>>>>>>{new_word}")
+        
+        found_valid_random_spot = False
+        while found_valid_random_spot == False and retry_count > 0: 
+            response = self.get_random_location(new_word)
+            found_valid_random_spot = response[0] #Identify valid position for new word (not crossed)
+            new_yx = response[1]
+            retry_count -= 1
+        
+        print (f"final new_yx: {new_yx}")
+
+        if retry_count == 0: 
+            return (0,0)
+        else:
+            return new_yx
+
+
     def draw_new_horse (self, new_word, pos, direction):
         y=pos[0]
         x=pos[1]
@@ -195,16 +205,16 @@ class crossword_board(object):
     def __place_new_horse (self, new_word, pos):
         
         direction = self.get_next_direction()
-        count = 10 # RETRY COUNTER 
 
-        while (not self.__validate_new_position(new_word, pos, direction)) and count > 0:
-            pos = self.determin_horse_pos(new_word) 
-            print (f'POSITION CHECKING COUNT:     {count}')
-            count -= 1
+        while (not self.__validate_new_position(new_word, pos, direction)) and self.CROSS_CHECK_RETRY_COUNT > 0:
+            pos = self.determine_horse_pos_crossed(new_word) 
+            self.CROSS_CHECK_RETRY_COUNT -= 1
 
-        if count == 0:
-            print (f"FAILED TO LOCATE WORD - {new_word}")
-            return (0,0)
+        #IF NO CROSSED WORD is FOUND, go RANDOM LOCATION
+        if self.CROSS_CHECK_RETRY_COUNT == 0:
+            pos = self.determine_horse_pos_randomly(new_word,direction, retry_count = self.RANDOM_POSITION_RETRY_COUNT)
+            if pos == (0,0):
+                return (0,0)
 
         if self.__validate_new_position(new_word, pos, direction):                 
             self.cross_checker.mark_new_cells(new_word, pos, direction)
@@ -212,7 +222,6 @@ class crossword_board(object):
             horse = word_horse(new_word, pos, direction)
             self.horses_on_board.add(horse)
             self.draw_new_horse (new_word, pos, direction)
-            
             return pos
         else: 
             return (0,0)
@@ -222,7 +231,7 @@ class crossword_board(object):
         self.__place_new_horse (new_word, new_yx)
 
     def place_new_crossed_horse(self, new_word):
-        new_yx = self.determin_horse_pos(new_word)        
+        new_yx = self.determine_horse_pos_crossed(new_word)        
         self.__place_new_horse (new_word, new_yx)
 
     def get_random_location(self,new_word):

@@ -1,6 +1,7 @@
 from typing import ClassVar
 import random
 import csv
+from random import shuffle
 
 class vocaburary (object):
 
@@ -34,14 +35,22 @@ class vocaburary (object):
         return
 
     def select_final_list_randomly(self, num_to_select):
+        random.seed()
         self.word_collecton = random.sample(self.word_collecton, num_to_select)
         return 
 
     def get_word_randomly(self):
-        return random.choice(tuple(self.word_collecton))
+        print (f"get_word_randomly:  {len(self.word_collecton)}")
+        if (len(self.word_collecton) > 0):
+            random.seed()
+            return random.choice(tuple(self.word_collecton))
     
     def move_word_to_restroom(self, last_word):
-        self.word_collecton.remove(last_word)
+
+        if (len(self.word_collecton) > 0):
+            self.word_collecton.remove(last_word)
+
+        print (f"LEFT word count in collection = {len(self.word_collecton)}")
         return     
 
     def readCSV(self,filepath):

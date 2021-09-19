@@ -48,9 +48,9 @@ if __name__ == "__main__":
     #####################
     # PARAMETERS 
     #####################
-    VOCA_COUNT = 20
-    word_count = 10
-    BOARD_SIZE = 25
+    VOCA_COUNT = 30
+    WORD_COUNT = 30
+    BOARD_SIZE = 30
     FILE_NAME = 'countries.csv'
 
     #####################
@@ -73,14 +73,16 @@ if __name__ == "__main__":
     cb.set_next_direction()
     cb.display()
 
-
-    while word_count > 0:     
-        new_word = myVoca.get_word_randomly()
-        cb.place_new_crossed_horse(new_word)
-        myVoca.move_word_to_restroom(new_word)
-        cb.display()
-        cb.set_next_direction()            
-        word_count -= 1
+    while WORD_COUNT > 0:     
+        if len(myVoca.word_collecton) > 0: 
+            new_word = myVoca.get_word_randomly()
+            cb.place_new_crossed_horse(new_word)
+            myVoca.move_word_to_restroom(new_word)
+            cb.display()
+            cb.set_next_direction()            
+            WORD_COUNT -= 1
+        else:
+            WORD_COUNT = 0 
 
     cb.list_horses()
     cb.get_random_location(new_word)

@@ -108,6 +108,7 @@ class cross_checker(object):
             if (x+len(word) < self.X_max): 
                 self.mask_horizontal[y,x+len(word)]=1
 
+        # LEAVE CORNER 4 CELLS AS FREE
             if y-1 >= 0:
                 if x-1 >= 0: 
                     self.mask_horizontal[y-1,x-1]=0
@@ -136,6 +137,7 @@ class cross_checker(object):
             if (y+len(word) < self.Y_max): 
                 self.mask_vertical[y+len(word),x]=1
 
+            # LEAVE CORNER 4 CELLS AS FREE
             if y-1 >= 0:
                 if x-1 >= 0: 
                     self.mask_vertical[y-1,x-1]=0
@@ -147,6 +149,49 @@ class cross_checker(object):
                     self.mask_vertical[y+len(word),x-1]=0
                 if x+1 < self.X_max: 
                     self.mask_vertical[y+len(word),x+1]=0
+
+
+    def mask_board2(self, word, x,y , direction):
+
+        length = len(word) 
+
+        if direction == cross_checker.HORIZONTAL:
+            i = 0 
+            for char in list(word):
+                # TOP  
+                if (y-1 >= 0): 
+                    self.mask_horizontal[y-1,x+i]=1
+                # MIDDLE 
+                self.mask_horizontal[y,x+i]=1
+                # BOTTOM
+                if (y+1 < self.Y_max): 
+                    self.mask_horizontal[y+1,x+i]=1
+                i += 1
+            # FAR LEFT 
+            if (x-1 >= 0): 
+                self.mask_horizontal[y,x-i]=1
+            # FAR RIGHT 
+            if (x+(length-1) >= self.X_max): 
+                self.mask_horizontal[y,x+(length-1)+1]=1
+
+        else:             
+            i = 0 
+            for char in list(word):
+                # LEFT 
+                if (x-1 >= 0): 
+                    self.mask_horizontal[y+i,x-1]=1
+                # CENTER  
+                self.mask_horizontal[y+i,x]=1
+                # RIGHT 
+                if (y+1 < self.X_max): 
+                    self.mask_horizontal[y+i,x+1]=1
+                i += 1
+            # FAR TOP
+            if (y-1 >= 0): 
+                self.mask_vertical[y-1,x]=1
+            # FAR BOTTOM 
+            if (y+(length-1) >= self.Y_max): 
+                self.mask_vertical[y+(length-1)+1,x]=1
 
 
     def __compare_arrays_overlay(self, array1, array2):        
@@ -171,6 +216,9 @@ class cross_checker(object):
         x=pos[1]
         result = True 
 
+        if (x < 0 or y <0 or x >= self.X_max or y >= self.Y_max ):
+            return False 
+
         if direction == cross_checker.HORIZONTAL:
             if (x + len(word) >= self.X_max): 
                 result = False 
@@ -178,7 +226,7 @@ class cross_checker(object):
             if (y + len(word) >= self.Y_max): 
                 result = False
 
-            print (f'check_bound - ({x}, {y})')
+        print (f'check_boundary - ({y}, {x}), delta - {len(word)}')
 
         return result
 
@@ -188,8 +236,11 @@ class cross_checker(object):
         result = False
         tempArray = np.zeros((self.X_max, self.Y_max), dtype = bool)
         
+        if self.X_max - len(new_word) < 1: 
+            return (False,(0,0))
+
         if direction == cross_checker.HORIZONTAL:
-            random_num_X = np.random.randint(0,self.X_max-len(new_word))
+            random_num_X = np.random.randint(0,self.X_max - len(new_word))
             random_num_Y = np.random.randint(0,self.Y_max)
             print (f"WORD:      {new_word}")
             print (f"RANDOM: X: {random_num_X}")
@@ -225,14 +276,11 @@ class cross_checker(object):
             result = True 
         return result 
 
-
-
     def check_individual_char_in_cells(board_array, word, start_pos, direction):
             result = True
             y=start_pos[0]
             x=start_pos[1]
             i = 0 
-            print(board_array)
             if direction == cross_checker.HORIZONTAL:
                 for char in list(word):
                     cell_value = board_array[y,x+i]
