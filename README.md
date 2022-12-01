@@ -1,6 +1,7 @@
 # crossword
  Cross Word Game
 
+exercise - Python for weekend fun
 
 ## Library
 
