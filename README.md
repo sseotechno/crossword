@@ -2,7 +2,7 @@
 
 A crossword board publisher using any of user dictionary for challenge   
 
-exercise - Python for weekend fun
+A tiny weekend project with Python numpy for fun
 
 ### Library
 
